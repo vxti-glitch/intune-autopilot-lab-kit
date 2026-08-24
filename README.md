@@ -1,8 +1,16 @@
 # Intune Autopilot Lab Kit
 
+[![Python tests](https://github.com/vxti-glitch/intune-autopilot-lab-kit/actions/workflows/python-tests.yml/badge.svg)](https://github.com/vxti-glitch/intune-autopilot-lab-kit/actions/workflows/python-tests.yml)
+![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![Tenant access](https://img.shields.io/badge/Tenant_access-not_required-2E8B57)
+
 A portfolio-ready help desk lab for preparing Windows devices for Microsoft Intune and Windows Autopilot onboarding.
 
 This project is intentionally offline-safe. It does not connect to a tenant, upload device hashes, or require Microsoft Graph permissions. Instead, it mirrors the intake, validation, import-file preparation, and documentation workflow a Tier 1 or Tier 2 technician would use before handing devices to an endpoint admin.
+
+![Sample Autopilot validation run](docs/assets/terminal-demo-final.png)
+
+_Sample run using the included synthetic Contoso device data._
 
 ## What it demonstrates
 
@@ -13,6 +21,17 @@ This project is intentionally offline-safe. It does not connect to a tenant, upl
 - Device age and readiness reporting
 - Help desk runbook writing
 - Automated Python unit tests and GitHub Actions CI
+
+## Workflow
+
+```mermaid
+flowchart LR
+    A[Device intake CSV] --> B[Schema validation]
+    B --> C[Identity and assignment checks]
+    C --> D[Autopilot import CSV]
+    C --> E[Readiness report]
+    E --> F[Help desk remediation]
+```
 
 ## Quick start
 
@@ -27,6 +46,8 @@ Generated files:
 - `reports/autopilot-import.csv`
 - `reports/readiness-report.json`
 - `reports/readiness-report.md`
+
+See the checked-in [example readiness report](docs/examples/readiness-report.md), [example JSON](docs/examples/readiness-report.json), and [example import CSV](docs/examples/autopilot-import.csv).
 
 ## Input CSV
 

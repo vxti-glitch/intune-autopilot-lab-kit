@@ -1,0 +1,5 @@
+Device Serial Number,Windows Product ID,Hardware Hash,Group Tag,Assigned User
+LAB-001,,BASE64HASHVALUE001,HELPDESK-STD,alex.johnson@contoso.com
+LAB-002,,BASE64HASHVALUE002,HELPDESK-STD,jamie.rivera@contoso.com
+LAB-003,,BASE64HASHVALUE003,HELPDESK-KIOSK,
+LAB-004,,BASE64HASHVALUE004,UNKNOWN-TAG,casey.nguyen@contoso.com

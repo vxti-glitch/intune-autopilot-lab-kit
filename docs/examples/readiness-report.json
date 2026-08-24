@@ -1,0 +1,76 @@
+{
+  "tenant_name": "Contoso Lab",
+  "device_count": 4,
+  "ready_device_count": 3,
+  "blocked_device_count": 1,
+  "severity_counts": {
+    "low": 2,
+    "medium": 1
+  },
+  "known_group_tags": {
+    "HELPDESK-STD": "Standard user-driven deployment",
+    "HELPDESK-KIOSK": "Kiosk or shared workstation deployment",
+    "HELPDESK-VIP": "Priority user deployment"
+  },
+  "devices": [
+    {
+      "serial_number": "LAB-001",
+      "hardware_hash": "BASE64HASHVALUE001",
+      "group_tag": "HELPDESK-STD",
+      "assigned_user": "alex.johnson@contoso.com",
+      "manufacturer": "Dell",
+      "model": "Latitude 5440",
+      "purchase_date": "2025-05-10"
+    },
+    {
+      "serial_number": "LAB-002",
+      "hardware_hash": "BASE64HASHVALUE002",
+      "group_tag": "HELPDESK-STD",
+      "assigned_user": "jamie.rivera@contoso.com",
+      "manufacturer": "Lenovo",
+      "model": "ThinkPad T14",
+      "purchase_date": "2024-11-19"
+    },
+    {
+      "serial_number": "LAB-003",
+      "hardware_hash": "BASE64HASHVALUE003",
+      "group_tag": "HELPDESK-KIOSK",
+      "assigned_user": "",
+      "manufacturer": "HP",
+      "model": "EliteBook 840",
+      "purchase_date": "2022-03-02"
+    },
+    {
+      "serial_number": "LAB-004",
+      "hardware_hash": "BASE64HASHVALUE004",
+      "group_tag": "UNKNOWN-TAG",
+      "assigned_user": "casey.nguyen@contoso.com",
+      "manufacturer": "Dell",
+      "model": "Latitude 7420",
+      "purchase_date": "2020-01-15"
+    }
+  ],
+  "findings": [
+    {
+      "severity": "low",
+      "check": "refresh-review",
+      "device": "LAB-003",
+      "message": "Device is older than 4 years.",
+      "action": "Confirm it should be redeployed instead of refreshed."
+    },
+    {
+      "severity": "medium",
+      "check": "unknown-group-tag",
+      "device": "LAB-004",
+      "message": "Group tag 'UNKNOWN-TAG' is not in the lab deployment profile map.",
+      "action": "Map the group tag to an Intune deployment profile before upload."
+    },
+    {
+      "severity": "low",
+      "check": "refresh-review",
+      "device": "LAB-004",
+      "message": "Device is older than 4 years.",
+      "action": "Confirm it should be redeployed instead of refreshed."
+    }
+  ]
+}

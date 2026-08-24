@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="300" viewBox="0 0 1120 300" role="img" aria-labelledby="title desc">
+  <title id="title">Sample Intune Autopilot lab run</title>
+  <desc id="desc">PowerShell command validating four synthetic devices and creating readiness reports.</desc>
+  <rect width="1120" height="300" rx="8" fill="#111827"/>
+  <rect width="1120" height="44" rx="8" fill="#1f2937"/>
+  <rect y="36" width="1120" height="8" fill="#1f2937"/>
+  <circle cx="24" cy="22" r="6" fill="#ef4444"/>
+  <circle cx="44" cy="22" r="6" fill="#f59e0b"/>
+  <circle cx="64" cy="22" r="6" fill="#22c55e"/>
+  <text x="88" y="28" fill="#d1d5db" font-family="Consolas, monospace" font-size="16">PowerShell - Autopilot intake validation</text>
+  <g fill="#e5e7eb" font-family="Consolas, monospace" font-size="17">
+    <text x="24" y="82"><tspan fill="#60a5fa">PS&gt;</tspan> python .\src\autopilot_lab.py --devices .\samples\devices.csv</text>
+    <text x="58" y="110">--out .\reports --tenant-name "Contoso Lab"</text>
+    <text x="24" y="158">Reviewed <tspan fill="#fbbf24">4</tspan> devices.</text>
+    <text x="24" y="190">Findings: <tspan fill="#fbbf24">3</tspan> total, <tspan fill="#22c55e">0 high</tspan>, <tspan fill="#fbbf24">1 medium</tspan>.</text>
+    <text x="24" y="222">Output written to .\reports</text>
+    <text x="24" y="262" fill="#9ca3af">Generated: autopilot-import.csv | readiness-report.json | readiness-report.md</text>
+  </g>
+</svg>
