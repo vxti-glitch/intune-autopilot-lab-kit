@@ -1,0 +1,5 @@
+SerialNumber,HardwareHash,Manufacturer,Model,GroupTag,AssignedUser,PurchaseDate
+LAB-001,BASE64HASHVALUE001,Dell,Latitude 5440,HELPDESK-STD,alex.johnson@contoso.com,2025-05-10
+LAB-002,BASE64HASHVALUE002,Lenovo,ThinkPad T14,HELPDESK-STD,jamie.rivera@contoso.com,2024-11-19
+LAB-003,BASE64HASHVALUE003,HP,EliteBook 840,HELPDESK-KIOSK,,2022-03-02
+LAB-004,BASE64HASHVALUE004,Dell,Latitude 7420,UNKNOWN-TAG,casey.nguyen@contoso.com,2020-01-15
