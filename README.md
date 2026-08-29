@@ -8,6 +8,20 @@ A portfolio-ready help desk lab for preparing Windows devices for Microsoft Intu
 
 This project is intentionally offline-safe. It does not connect to a tenant, upload device hashes, or require Microsoft Graph permissions. Instead, it mirrors the intake, validation, import-file preparation, and documentation workflow a Tier 1 or Tier 2 technician would use before handing devices to an endpoint admin.
 
+## Interactive demo
+
+[Launch the Autopilot Readiness Lab](https://vxti-glitch.github.io/intune-autopilot-lab-kit/)
+
+The browser demo lets a recruiter or hiring manager complete the workflow without installing Python or accessing a Microsoft tenant:
+
+- Switch between synthetic device-intake scenarios
+- Run the same identity, assignment, group-tag, and age checks as the Python tool
+- Inspect device-level remediation and endpoint-admin handoff notes
+- Preview and download the generated import CSV, Markdown report, or JSON report
+- Optionally load a CSV that stays inside the browser and is never uploaded
+
+> **Portfolio disclosure:** This is hands-on simulated lab work, not paid employment or production tenant experience. All included people, devices, hashes, and tenant data are fictional.
+
 ![Sample Autopilot validation run](docs/assets/terminal-demo-final.png)
 
 _Sample run using the included synthetic Contoso device data._
@@ -21,6 +35,7 @@ _Sample run using the included synthetic Contoso device data._
 - Device age and readiness reporting
 - Help desk runbook writing
 - Automated Python unit tests and GitHub Actions CI
+- Recruiter-friendly interactive workflow published with GitHub Pages
 
 ## Workflow
 
@@ -48,6 +63,14 @@ Generated files:
 - `reports/readiness-report.md`
 
 See the checked-in [example readiness report](docs/examples/readiness-report.md), [example JSON](docs/examples/readiness-report.json), and [example import CSV](docs/examples/autopilot-import.csv).
+
+To preview the interactive demo locally:
+
+```powershell
+python -m http.server 8000 --directory docs
+```
+
+Then open `http://127.0.0.1:8000`. The GitHub Pages workflow publishes the `docs` directory after Pages is configured to use GitHub Actions.
 
 ## Input CSV
 

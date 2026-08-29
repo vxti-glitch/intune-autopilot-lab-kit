@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Interactive, offline-safe Intune Autopilot intake validation portfolio lab by vxti-glitch.">
+    <meta name="theme-color" content="#071b16">
+    <title>Autopilot Readiness Lab · vxti-glitch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./app.mjs"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to demo</a>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Autopilot Readiness Lab home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span><strong>AUTOPILOT</strong><small>READINESS LAB</small></span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#lab">Live lab</a>
+        <a href="#workflow">Workflow</a>
+        <a href="./helpdesk-runbook.md">Runbook</a>
+        <a class="nav-cta" href="https://github.com/vxti-glitch/intune-autopilot-lab-kit">View source <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <div class="lab-label"><span class="pulse"></span> Interactive portfolio lab · Synthetic data</div>
+          <h1>Catch bad device data <em>before</em> Autopilot import.</h1>
+          <p class="hero-lede">A browser-based walkthrough of the offline Intune and Windows Autopilot intake validator built by <strong>vxti-glitch</strong>. Review a device batch, identify deployment blockers, and generate an escalation-ready handoff.</p>
+          <div class="hero-actions">
+            <button class="button button--primary" id="start-tour" type="button">Start the 90-second tour <span aria-hidden="true">→</span></button>
+            <a class="button button--ghost" href="#safety">How this stays safe</a>
+          </div>
+          <ul class="hero-proof" aria-label="Project highlights">
+            <li><strong>100%</strong><span>client-side</span></li>
+            <li><strong>0</strong><span>tenant permissions</span></li>
+            <li><strong>3</strong><span>export formats</span></li>
+          </ul>
+        </div>
+        <div class="hero-visual" aria-label="Autopilot device intake workflow illustration">
+          <div class="visual-grid"></div>
+          <div class="orbit orbit--one"></div>
+          <div class="orbit orbit--two"></div>
+          <div class="center-node">
+            <span class="windows-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <small>INTAKE</small>
+            <strong>VALIDATED</strong>
+          </div>
+          <div class="float-card float-card--one"><span class="dot dot--green"></span><span><small>Schema</small><strong>PASS</strong></span></div>
+          <div class="float-card float-card--two"><span class="dot dot--amber"></span><span><small>Group tag</small><strong>REVIEW</strong></span></div>
+          <div class="float-card float-card--three"><span class="dot dot--green"></span><span><small>Export</small><strong>READY</strong></span></div>
+        </div>
+      </section>
+
+      <section class="safety-strip" id="safety" aria-label="Demo safety statement">
+        <span class="shield" aria-hidden="true">◇</span>
+        <div><strong>This is a simulated portfolio lab—not a live Microsoft tenant.</strong><p>All included names, hashes, users, and devices are fictional. Your optional CSV is processed only inside your browser and is never uploaded.</p></div>
+        <span class="safety-tag">OFFLINE-SAFE</span>
+      </section>
+
+      <section class="tour" id="workflow">
+        <div class="section-heading">
+          <span class="eyebrow">A technician's workflow</span>
+          <h2>From intake sheet to clean handoff</h2>
+          <p>The demo mirrors the same checks and outputs as the repository's Python command-line tool.</p>
+        </div>
+        <ol class="tour-steps">
+          <li><span class="step-number">01</span><div><strong>Choose an intake batch</strong><p>Use a synthetic scenario or load a compatible CSV locally.</p></div></li>
+          <li><span class="step-number">02</span><div><strong>Run readiness checks</strong><p>Review identity, profile mapping, assignment, and device age.</p></div></li>
+          <li><span class="step-number">03</span><div><strong>Document and escalate</strong><p>Export the import CSV plus Markdown or JSON readiness reports.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="lab" id="lab">
+        <div class="lab-topbar">
+          <div>
+            <span class="eyebrow">Live workspace</span>
+            <h2>Device intake audit</h2>
+          </div>
+          <div class="local-badge"><span></span> Runs locally in your browser</div>
+        </div>
+
+        <div class="controls-card">
+          <div class="field-group">
+            <label for="scenario">Synthetic scenario</label>
+            <select id="scenario">
+              <option value="baseline">Mixed intake — 4 devices</option>
+              <option value="identity">Identity collision — 5 devices</option>
+              <option value="assignment">Assignment cleanup — 4 devices</option>
+              <option value="clean">Ready batch — 3 devices</option>
+            </select>
+            <p id="scenario-description">A realistic batch with an unknown group tag and aging hardware to review.</p>
+          </div>
+          <div class="control-actions">
+            <label class="file-button" for="csv-file"><span aria-hidden="true">＋</span><span id="file-label">Load your own CSV locally</span></label>
+            <input id="csv-file" type="file" accept=".csv,text/csv">
+            <button class="button button--run" id="run-audit" type="button"><span class="run-icon" aria-hidden="true">▶</span> Run intake audit</button>
+          </div>
+          <p class="sr-status" id="audit-status" role="status" aria-live="polite">Demo loaded. Choose a scenario, then run the intake audit.</p>
+        </div>
+
+        <div class="metrics" aria-label="Readiness metrics">
+          <article class="metric"><span>Devices reviewed</span><strong id="metric-devices">4</strong><small>intake records</small></article>
+          <article class="metric metric--green"><span>Ready for import</span><strong id="metric-ready">3</strong><small>no blockers</small></article>
+          <article class="metric metric--amber"><span>Needs review</span><strong id="metric-review">1</strong><small>technician action</small></article>
+          <article class="metric metric--red"><span>High severity</span><strong id="metric-high">0</strong><small>stop before import</small></article>
+          <article class="metric metric--progress">
+            <div><span>Batch readiness</span><strong id="readiness-value">75%</strong></div>
+            <div class="progress-track" aria-hidden="true"><span id="readiness-bar"></span></div>
+            <small>High and medium findings block a device.</small>
+          </article>
+        </div>
+
+        <div class="workspace-grid">
+          <article class="panel panel--devices" data-panel="devices">
+            <div class="panel-heading"><div><span class="eyebrow">Input</span><h3>Device intake</h3></div><span class="panel-hint">Select a row for details</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Serial</th><th>Hardware</th><th>Group tag</th><th>Assigned user</th><th>Status</th></tr></thead>
+                <tbody id="device-rows"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel panel--detail">
+            <div class="panel-heading"><div><span class="eyebrow">Context</span><h3>Technician review</h3></div></div>
+            <div id="device-detail"></div>
+          </article>
+
+          <article class="panel panel--findings">
+            <div class="panel-heading"><div><span class="eyebrow">Checks</span><h3>Findings &amp; remediation</h3></div><span class="panel-hint">High → medium → low</span></div>
+            <div id="findings-list" class="findings-list"></div>
+          </article>
+        </div>
+
+        <article class="output-panel">
+          <div class="output-heading">
+            <div><span class="eyebrow">Handoff</span><h3>Generated output</h3></div>
+            <div class="output-actions">
+              <div class="tabs" role="tablist" aria-label="Output format">
+                <button class="is-active" type="button" role="tab" aria-selected="true" data-output="csv">Import CSV</button>
+                <button type="button" role="tab" aria-selected="false" data-output="md">Markdown</button>
+                <button type="button" role="tab" aria-selected="false" data-output="json">JSON</button>
+              </div>
+              <button class="download-button" id="download-output" type="button">Download autopilot-import.csv</button>
+            </div>
+          </div>
+          <pre id="output-preview" tabindex="0" aria-label="Generated output preview"></pre>
+          <p class="output-note"><span aria-hidden="true">i</span> In a real environment, the import CSV would be stored in a restricted location and handed to an authorized endpoint administrator.</p>
+        </article>
+      </section>
+
+      <section class="about-project">
+        <div>
+          <span class="eyebrow">What this project demonstrates</span>
+          <h2>Entry-level support skills, shown through a real workflow.</h2>
+        </div>
+        <div class="skill-grid">
+          <span>Device intake validation</span><span>Windows Autopilot concepts</span><span>Intune profile readiness</span><span>Data quality checks</span><span>Escalation documentation</span><span>Python automation</span>
+        </div>
+        <div class="project-note">
+          <p><strong>Built by vxti-glitch</strong> as hands-on portfolio work for help desk and IT support roles. This lab demonstrates process understanding and technical practice; it is not presented as paid or production experience.</p>
+          <a class="button button--dark" href="https://github.com/vxti-glitch/intune-autopilot-lab-kit">Explore the code and tests <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="brand brand--footer"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span><strong>AUTOPILOT</strong><small>READINESS LAB</small></span></div>
+      <p>© <span id="current-year"></span> vxti-glitch · Synthetic portfolio demonstration</p>
+      <div><a href="https://github.com/vxti-glitch">GitHub profile</a><a href="./helpdesk-runbook.md">Help desk runbook</a></div>
+    </footer>
+  </body>
+</html>
