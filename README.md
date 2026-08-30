@@ -17,6 +17,7 @@ The browser demo lets a recruiter or hiring manager complete the workflow withou
 - Switch between synthetic device-intake scenarios
 - Run the same identity, assignment, group-tag, and age checks as the Python tool
 - Inspect device-level remediation and endpoint-admin handoff notes
+- Use an Intune-inspired command bar, device search, profile-assignment status, and simulated sync state
 - Preview and download the generated import CSV, Markdown report, or JSON report
 - Optionally load a CSV that stays inside the browser and is never uploaded
 

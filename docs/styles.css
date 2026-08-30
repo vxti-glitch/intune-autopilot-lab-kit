@@ -373,6 +373,33 @@ footer a:hover { color: var(--green); }
   #device-detail { min-height: 0; }
 }
 
+.admin-commandbar {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin: 14px 0;
+  padding: 11px 13px;
+}
+.admin-path { align-items: center; color: var(--ink-soft); display: flex; flex-wrap: wrap; font-size: 12px; gap: 7px; }
+.admin-path i { color: #9aa9a4; font-style: normal; }
+.admin-path strong { color: var(--ink); }
+.admin-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 7px; justify-content: flex-end; }
+.admin-actions button { background: #fff; border: 1px solid #b9c8c2; border-radius: 7px; cursor: pointer; font-size: 11px; font-weight: 750; padding: 7px 10px; }
+.admin-actions button:first-child { background: var(--green-deep); border-color: var(--green-deep); color: #fff; }
+.admin-actions button:hover, .admin-actions button:focus-visible { border-color: var(--green-deep); box-shadow: 0 0 0 3px var(--green-soft); }
+.admin-actions button:disabled { cursor: wait; opacity: .55; }
+#last-sync { color: var(--ink-soft); font-family: var(--mono); font-size: 9px; white-space: nowrap; }
+.device-search input { background: #f7faf8; border: 1px solid #c8d4cf; border-radius: 8px; font-size: 11px; min-width: 230px; padding: 8px 10px; }
+.device-search input:focus { border-color: var(--green-deep); box-shadow: 0 0 0 3px var(--green-soft); outline: 0; }
+.profile-status { border-radius: 999px; display: inline-flex; font-size: 9px; font-weight: 800; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
+.profile-status--assigned { background: var(--green-soft); color: var(--green-deep); }
+.profile-status--unassigned { background: var(--amber-soft); color: #8c5608; }
+.table-empty { color: var(--ink-soft); padding: 26px; text-align: center; }
+
 @media (max-width: 720px) {
   .site-header { width: calc(100% - 32px); }
   .nav-cta { padding: 9px 11px; font-size: 10px; }
@@ -393,6 +420,9 @@ footer a:hover { color: var(--green); }
   .lab { padding: 72px 16px 84px; }
   .lab-topbar { align-items: start; flex-direction: column; gap: 18px; }
   .controls-card { padding: 16px; }
+  .admin-commandbar { align-items: stretch; flex-direction: column; }
+  .admin-actions { justify-content: flex-start; }
+  .device-search, .device-search input { min-width: 0; width: 100%; }
   .field-group { grid-template-columns: 1fr; gap: 8px; }
   .control-actions { align-items: stretch; flex-direction: column; }
   .file-button, .button--run { justify-content: center; }

@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css">
-    <script type="module" src="./app.mjs"></script>
+    <link rel="stylesheet" href="./styles.css?v=20260829-ops-workspace">
+    <script type="module" src="./app.mjs?v=20260829-ops-workspace"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to demo</a>
@@ -105,6 +105,16 @@
           <p class="sr-status" id="audit-status" role="status" aria-live="polite">Demo loaded. Choose a scenario, then run the intake audit.</p>
         </div>
 
+        <nav class="admin-commandbar" aria-label="Simulated Intune device actions">
+          <div class="admin-path"><span>Devices</span><i aria-hidden="true">/</i><span>Windows</span><i aria-hidden="true">/</i><span>Enrollment</span><i aria-hidden="true">/</i><strong>Autopilot devices</strong></div>
+          <div class="admin-actions">
+            <button type="button" id="toolbar-import">＋ Import CSV</button>
+            <button type="button" id="toolbar-sync">↻ Sync simulation</button>
+            <button type="button" id="toolbar-refresh">Refresh</button>
+            <span id="last-sync">Not synced yet</span>
+          </div>
+        </nav>
+
         <div class="metrics" aria-label="Readiness metrics">
           <article class="metric"><span>Devices reviewed</span><strong id="metric-devices">4</strong><small>intake records</small></article>
           <article class="metric metric--green"><span>Ready for import</span><strong id="metric-ready">3</strong><small>no blockers</small></article>
@@ -119,10 +129,10 @@
 
         <div class="workspace-grid">
           <article class="panel panel--devices" data-panel="devices">
-            <div class="panel-heading"><div><span class="eyebrow">Input</span><h3>Device intake</h3></div><span class="panel-hint">Select a row for details</span></div>
+            <div class="panel-heading"><div><span class="eyebrow">Input</span><h3>Device intake</h3></div><label class="device-search"><span class="sr-only">Search devices</span><input id="device-search" type="search" placeholder="Search serial, model, tag, or user"></label></div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Serial</th><th>Hardware</th><th>Group tag</th><th>Assigned user</th><th>Status</th></tr></thead>
+                <thead><tr><th>Serial</th><th>Hardware</th><th>Group tag</th><th>Assigned user</th><th>Profile status</th><th>Readiness</th></tr></thead>
                 <tbody id="device-rows"></tbody>
               </table>
             </div>

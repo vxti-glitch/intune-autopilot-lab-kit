@@ -56,6 +56,7 @@ const state = {
   selectedDevice: null,
   activeOutput: "csv",
   customFileName: "",
+  deviceQuery: "",
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -71,6 +72,7 @@ const elements = {
   detail: $("#device-detail"),
   output: $("#output-preview"),
   download: $("#download-output"),
+  deviceSearch: $("#device-search"),
 };
 
 function escapeHtml(value) {
@@ -88,6 +90,12 @@ function statusLabel(status) {
   return "Ready";
 }
 
+function profileStatus(device) {
+  const mapped = ["HELPDESK-STD", "HELPDESK-VIP", "HELPDESK-KIOSK"].includes(device.groupTag);
+  if (!mapped) return { key: "unassigned", label: "Needs mapping" };
+  return { key: "assigned", label: "Assigned" };
+}
+
 function renderMetrics() {
   const { summary } = state.result;
   $("#metric-devices").textContent = summary.deviceCount;
@@ -99,17 +107,21 @@ function renderMetrics() {
 }
 
 function renderTable() {
-  elements.tableBody.innerHTML = state.result.devices.map((device) => {
+  const query = state.deviceQuery.trim().toLowerCase();
+  const visibleDevices = state.result.devices.filter((device) => !query || [device.serialNumber, device.manufacturer, device.model, device.groupTag, device.assignedUser].join(" ").toLowerCase().includes(query));
+  elements.tableBody.innerHTML = visibleDevices.map((device) => {
     const status = state.result.deviceStatuses[device.serialNumber];
+    const profile = profileStatus(device);
     return `
       <tr data-device="${escapeHtml(device.serialNumber)}" tabindex="0" aria-label="View ${escapeHtml(device.serialNumber)} details">
         <td><strong>${escapeHtml(device.serialNumber)}</strong><span class="mobile-model">${escapeHtml(device.manufacturer)} ${escapeHtml(device.model)}</span></td>
         <td>${escapeHtml(device.manufacturer)} ${escapeHtml(device.model)}</td>
         <td><span class="mono">${escapeHtml(device.groupTag)}</span></td>
         <td>${device.assignedUser ? escapeHtml(device.assignedUser) : '<span class="muted">Shared / unassigned</span>'}</td>
+        <td><span class="profile-status profile-status--${profile.key}">${profile.label}</span></td>
         <td><span class="status status--${status}">${statusLabel(status)}</span></td>
       </tr>`;
-  }).join("");
+  }).join("") || '<tr><td colspan="6" class="table-empty">No devices match this search.</td></tr>';
 
   elements.tableBody.querySelectorAll("tr").forEach((row) => {
     const select = () => {
@@ -165,6 +177,7 @@ function renderDetail() {
     return;
   }
   const findings = state.result.findings.filter((finding) => finding.device === device.serialNumber);
+  const profile = profileStatus(device);
   elements.detail.innerHTML = `
     <div class="detail-heading">
       <div><span class="eyebrow">Selected device</span><h3>${escapeHtml(device.serialNumber)}</h3></div>
@@ -173,6 +186,7 @@ function renderDetail() {
     <dl class="device-facts">
       <div><dt>Hardware</dt><dd>${escapeHtml(device.manufacturer)} ${escapeHtml(device.model)}</dd></div>
       <div><dt>Group tag</dt><dd class="mono">${escapeHtml(device.groupTag)}</dd></div>
+      <div><dt>Deployment profile</dt><dd><span class="profile-status profile-status--${profile.key}">${profile.label}</span></dd></div>
       <div><dt>Assigned user</dt><dd>${escapeHtml(device.assignedUser || "Shared / unassigned")}</dd></div>
       <div><dt>Purchase date</dt><dd>${escapeHtml(device.purchaseDate || "Not supplied")}</dd></div>
     </dl>
@@ -235,6 +249,33 @@ elements.scenario.addEventListener("change", () => {
 });
 
 elements.run.addEventListener("click", () => runAudit());
+
+elements.deviceSearch.addEventListener("input", () => {
+  state.deviceQuery = elements.deviceSearch.value;
+  const query = state.deviceQuery.trim().toLowerCase();
+  const visible = state.result.devices.filter((device) => !query || [device.serialNumber, device.manufacturer, device.model, device.groupTag, device.assignedUser].join(" ").toLowerCase().includes(query));
+  if (!visible.some((device) => device.serialNumber === state.selectedDevice)) state.selectedDevice = visible[0]?.serialNumber ?? null;
+  renderTable();
+  renderDetail();
+});
+
+$("#toolbar-import").addEventListener("click", () => elements.file.click());
+$("#toolbar-refresh").addEventListener("click", () => runAudit());
+$("#toolbar-sync").addEventListener("click", (event) => {
+  const button = event.currentTarget;
+  button.disabled = true;
+  elements.status.textContent = "Simulating an Intune device sync. No tenant connection is used…";
+  $("#last-sync").textContent = "Syncing…";
+  window.setTimeout(() => {
+    state.result = validateIntake(state.devices);
+    state.selectedDevice = state.result.devices[0]?.serialNumber ?? null;
+    renderAll();
+    const stamp = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" }).format(new Date());
+    $("#last-sync").textContent = `Last simulated sync ${stamp}`;
+    elements.status.textContent = "Simulated sync completed. Device readiness was refreshed locally.";
+    button.disabled = false;
+  }, 700);
+});
 
 elements.file.addEventListener("change", async () => {
   const file = elements.file.files[0];
