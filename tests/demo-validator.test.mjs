@@ -56,6 +56,12 @@ test("kiosk device may be unassigned and an old device receives a low note", () 
   assert.equal(result.deviceStatuses["LAB-KIOSK"], "ready-with-note");
 });
 
+test("group tag and assigned user are optional and do not block import", () => {
+  const result = validateIntake([{ ...cleanDevice, serialNumber: "LAB-OPTIONAL", hardwareHash: "SAFE-OPTIONAL", groupTag: "", assignedUser: "" }], { today: "2026-08-29" });
+  assert.equal(result.summary.readyDeviceCount, 1);
+  assert.deepEqual(result.findings.map(({ severity }) => severity), ["low"]);
+});
+
 test("CSV parser accepts browser-loaded intake and validates required fields", () => {
   const parsed = parseCsv([
     "SerialNumber,HardwareHash,Manufacturer,Model,GroupTag,AssignedUser,PurchaseDate",
@@ -84,4 +90,5 @@ test("generated outputs use Autopilot columns and document the review", () => {
   assert.match(csv, /^Device Serial Number,Windows Product ID,Hardware Hash,Group Tag,Assigned User/);
   assert.match(markdown, /Ready for import: 1/);
   assert.match(markdown, /No blocking findings detected\./);
+  assert.match(markdown, /authorized endpoint administrator verify Entra group membership/i);
 });

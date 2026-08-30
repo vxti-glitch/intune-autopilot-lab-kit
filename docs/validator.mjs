@@ -7,8 +7,9 @@ export const KNOWN_GROUP_TAGS = Object.freeze({
 export const REQUIRED_COLUMNS = Object.freeze([
   "SerialNumber",
   "HardwareHash",
-  "GroupTag",
 ]);
+export const STRICT_IMPORT_COLUMNS = Object.freeze(["Device Serial Number", "Windows Product ID", "Hardware Hash", "Group Tag", "Assigned User"]);
+export const MAX_MANUAL_IMPORT_ROWS = 500;
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -95,23 +96,23 @@ export function validateIntake(rawDevices, options = {}) {
       );
     }
 
-    if (!(device.groupTag in KNOWN_GROUP_TAGS)) {
+    if (device.groupTag && !(device.groupTag in KNOWN_GROUP_TAGS)) {
       addFinding(
         "medium",
         "unknown-group-tag",
         device.serialNumber,
-        `Group tag '${device.groupTag}' is not in the lab deployment profile map.`,
-        "Map the group tag to an Intune deployment profile before upload.",
+        `Group tag '${device.groupTag}' is not in the lab expected-assignment map.`,
+        "Confirm the optional OrderID/group-tag expectation; an authorized admin must verify tenant assignments.",
       );
     }
 
     if (device.groupTag !== "HELPDESK-KIOSK" && !device.assignedUser) {
       addFinding(
-        "medium",
+        "low",
         "missing-assigned-user",
         device.serialNumber,
-        "Assigned user is missing for a user-driven deployment.",
-        "Add the assigned user's UPN or move the device to a shared-device profile.",
+        "Assigned User is blank. This Microsoft import field is optional.",
+        "Confirm the lab handoff expectation; do not block import solely for this optional field.",
       );
     }
 
@@ -188,17 +189,18 @@ export function buildImportRows(devices) {
   });
 }
 
-function escapeCsv(value) {
-  const text = String(value ?? "");
-  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
 export function rowsToCsv(rows) {
   if (!rows.length) return "";
   const headers = Object.keys(rows[0]);
+  if (rows.length > MAX_MANUAL_IMPORT_ROWS) throw new Error(`Manual import supports no more than ${MAX_MANUAL_IMPORT_ROWS} rows.`);
+  if (headers.join("|") !== STRICT_IMPORT_COLUMNS.join("|")) throw new Error("Strict import headers must match the Microsoft column names and order exactly.");
+  rows.forEach((row, rowIndex) => headers.forEach((header) => {
+    const value = String(row[header] ?? "");
+    if (/[",\r\n]/.test(value)) throw new Error(`Row ${rowIndex + 2} field '${header}' would require quotation marks, which the strict import export does not allow.`);
+  }));
   return [
-    headers.map(escapeCsv).join(","),
-    ...rows.map((row) => headers.map((header) => escapeCsv(row[header])).join(",")),
+    headers.join(","),
+    ...rows.map((row) => headers.map((header) => row[header]).join(",")),
   ].join("\n");
 }
 
@@ -211,7 +213,8 @@ export function buildReportPayload(result, tenantName = "Contoso Demo Lab") {
     severity_counts: Object.fromEntries(
       Object.entries(result.summary.severityCounts).filter(([, count]) => count > 0),
     ),
-    known_group_tags: KNOWN_GROUP_TAGS,
+    expected_group_tag_mappings: KNOWN_GROUP_TAGS,
+    boundary: "Offline validation cannot verify Microsoft Entra group membership or Intune assignments.",
     devices: result.devices.map((device) => ({
       serial_number: device.serialNumber,
       hardware_hash: device.hardwareHash,
@@ -235,9 +238,9 @@ export function renderMarkdown(payload) {
     `- Ready for import: ${payload.ready_device_count}`,
     `- Needs review: ${payload.blocked_device_count}`,
     "",
-    "## Known Group Tags",
+    "## Expected Group Tag Mappings",
     "",
-    ...Object.entries(payload.known_group_tags)
+    ...Object.entries(payload.expected_group_tag_mappings)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([tag, description]) => `- \`${tag}\`: ${description}`),
     "",
@@ -263,6 +266,7 @@ export function renderMarkdown(payload) {
     "2. Confirm medium severity findings with the endpoint admin.",
     "3. Save the generated import CSV in a restricted location.",
     "4. Upload only sanitized demo data to public repositories.",
+    "5. Have an authorized endpoint administrator verify Entra group membership and Intune assignments.",
     "",
   );
   return lines.join("\n");
@@ -318,8 +322,8 @@ export function parseCsv(csvText) {
       model: get(values, "Model"),
       purchaseDate: get(values, "PurchaseDate"),
     };
-    if (!device.serialNumber || !device.hardwareHash || !device.groupTag) {
-      throw new Error(`Row ${index + 2} needs SerialNumber, HardwareHash, and GroupTag.`);
+    if (!device.serialNumber || !device.hardwareHash) {
+      throw new Error(`Row ${index + 2} needs SerialNumber and HardwareHash. GroupTag and AssignedUser are optional.`);
     }
     return device;
   });

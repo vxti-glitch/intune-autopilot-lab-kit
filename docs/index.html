@@ -72,7 +72,7 @@
         </div>
         <ol class="tour-steps">
           <li><span class="step-number">01</span><div><strong>Choose an intake batch</strong><p>Use a synthetic scenario or load a compatible CSV locally.</p></div></li>
-          <li><span class="step-number">02</span><div><strong>Run readiness checks</strong><p>Review identity, profile mapping, assignment, and device age.</p></div></li>
+          <li><span class="step-number">02</span><div><strong>Run offline readiness checks</strong><p>Review identity, strict import validity, optional expected mapping, and device age without claiming tenant verification.</p></div></li>
           <li><span class="step-number">03</span><div><strong>Document and escalate</strong><p>Export the import CSV plus Markdown or JSON readiness reports.</p></div></li>
         </ol>
       </section>
@@ -132,7 +132,7 @@
             <div class="panel-heading"><div><span class="eyebrow">Input</span><h3>Device intake</h3></div><label class="device-search"><span class="sr-only">Search devices</span><input id="device-search" type="search" placeholder="Search serial, model, tag, or user"></label></div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Serial</th><th>Hardware</th><th>Group tag</th><th>Assigned user</th><th>Profile status</th><th>Readiness</th></tr></thead>
+                <thead><tr><th>Serial</th><th>Hardware</th><th>Group tag</th><th>Assigned user</th><th>Expected mapping</th><th>Readiness</th></tr></thead>
                 <tbody id="device-rows"></tbody>
               </table>
             </div>
@@ -162,8 +162,66 @@
             </div>
           </div>
           <pre id="output-preview" tabindex="0" aria-label="Generated output preview"></pre>
-          <p class="output-note"><span aria-hidden="true">i</span> In a real environment, the import CSV would be stored in a restricted location and handed to an authorized endpoint administrator.</p>
+          <p class="output-note"><span aria-hidden="true">i</span> The strict export uses Microsoft’s exact five headers; serial number and hardware hash are required, while Windows Product ID, Group Tag, and Assigned User are optional. An authorized admin must verify tenant assignments.</p>
         </article>
+      </section>
+
+      <section class="deployment-library" id="deployment-library" aria-labelledby="deployment-library-title">
+        <div class="section-heading">
+          <span class="eyebrow">Deployment field guide · reviewed 2026-08-30</span>
+          <h2 id="deployment-library-title">Choose the Windows Deployment Path</h2>
+          <p>Classic Windows Autopilot and Windows Autopilot device preparation coexist. They use different registration, assignment, deployment-mode, application, script, and troubleshooting models; this lab never treats one as a rename of the other.</p>
+        </div>
+        <div class="path-comparison">
+          <article><span>Classic Autopilot</span><h3>User-driven deployment</h3><p>Registered device, assigned classic profile, user credentials, Microsoft Entra join or supported hybrid path, MDM enrollment, ESP, apps and policy.</p></article>
+          <article><span>Classic Autopilot</span><h3>Pre-provisioned deployment</h3><p>Technician phase, scenario-specific attestation/physical-device requirements, reseal and user phase. Do not claim every Autopilot path requires TPM.</p></article>
+          <article><span>Classic Autopilot</span><h3>Self-deploying / existing device</h3><p>Separate supported scenarios with their own prerequisites; existing-device deployment can use Configuration Manager task-sequence media.</p></article>
+          <article><span>Device preparation</span><h3>Windows Autopilot device preparation</h3><p>Current Entra-join-first workflow with different group/policy behavior and supported limits. Standard preparation does not use the classic pre-registration/profile model.</p></article>
+        </div>
+
+        <article class="guide-panel">
+          <div><span class="eyebrow">Readiness matrix</span><h3>Windows Autopilot Prerequisites and Readiness Matrix</h3></div>
+          <div class="table-wrap"><table><thead><tr><th>Gate</th><th>Technician can verify</th><th>Requires authorized tenant/admin evidence</th></tr></thead><tbody>
+            <tr><td>Windows</td><td>Edition, build, OOBE/reset state, power and storage</td><td>Supported organizational deployment path</td></tr>
+            <tr><td>Identity</td><td>Local join evidence with <code>dsregcmd /status</code></td><td>Entra user/device state, join permission, MDM scope</td></tr>
+            <tr><td>Intune</td><td>Local MDM/event/diagnostic evidence</td><td>License, enrollment restrictions/limit, apps, profiles, compliance, filters</td></tr>
+            <tr><td>Network</td><td>DNS, time, proxy and required endpoint reachability</td><td>Firewall/proxy allowlist and service-side health</td></tr>
+            <tr><td>Hardware</td><td>Physical/VM context, firmware and TPM state</td><td>Whether the selected scenario requires TPM/attestation</td></tr>
+          </tbody></table></div>
+        </article>
+
+        <div class="guide-grid">
+          <article><span>Import specification</span><h3>Manual Import CSV Specification and Validation Checklist</h3><p>Exact case-sensitive headers: Device Serial Number, Windows Product ID, Hardware Hash, Group Tag, Assigned User. Serial and hash are required; the other three are optional. No extra columns, quotation marks, or more than 500 rows. Export ANSI-compatible text and avoid editing the strict file in Excel.</p></article>
+          <article><span>Assignment boundary</span><h3>Group Tags, Dynamic Device Groups, and Assignment Boundaries</h3><p><code>Group Tag</code> becomes the Autopilot device <code>OrderID</code> attribute. A dynamic Entra device group can evaluate that attribute, and Intune content can target the group. This offline demo validates only the expected mapping; it cannot verify membership or assignment.</p></article>
+          <article><span>Before OOBE</span><h3>Pre-deployment Technician Readiness Checklist</h3><p>Verify asset/serial, trusted hash source, selected path, supported Windows state, power, network, physical/TPM needs for that path, strict import data, reset approval, data disposition, and the endpoint-admin handoff.</p></article>
+          <article><span>After enrollment</span><h3>Post-enrollment Validation Checklist</h3><p>Verify join and MDM state, primary-user/ownership expectation, sync, required apps, configuration and compliance results, update state, BitLocker/recovery-key ownership, user task, and ticket evidence. Tenant results require authorized access.</p></article>
+          <article><span>Evidence collection</span><h3>Autopilot and Enrollment Evidence Collection Guide</h3><p>Record OOBE stage/error/time, <code>dsregcmd /status</code>, <code>mdmdiagnosticstool.exe -area Autopilot -cab ...</code>, DeviceManagement and Autopilot Event Viewer channels, MDM diagnostic report, and IME logs under <code>ProgramData\Microsoft\IntuneManagementExtension\Logs</code>. Redact identifiers and tokens.</p></article>
+          <article><span>ESP decision flow</span><h3>Enrollment Status Page Troubleshooting Flow</h3><p>Identify device preparation, device setup, or account setup. Determine the blocking item, then separate network, certificate, policy, app detection/install context, IME, timeout, or service-side assignment. Export the stage, item, code, timestamp, logs and attempted safe action.</p></article>
+        </div>
+
+        <div class="section-heading scenario-heading"><span class="eyebrow">Troubleshooting library</span><h2>Deployment scenarios</h2><p>Every scenario separates local evidence from tenant evidence and ends with a bounded conclusion, safe handoff, verification, and escalation condition.</p></div>
+        <div class="scenario-library">
+          <article><b>01</b><h3>Hardware Hash Import Is Rejected</h3><p>Check header case/order, required serial/hash, supported optional columns, extra fields, quotes, encoding, duplicate identity, 500-row limit, and the exact portal error.</p></article>
+          <article><b>02</b><h3>Device Is Not Recognized as an Autopilot Device</h3><p>Compare trusted registration source, serial, import status, service timing, selected deployment path, reset/OOBE state, and authorized admin evidence.</p></article>
+          <article><b>03</b><h3>Expected Deployment Profile Does Not Apply</h3><p>Trace device identity → Group Tag/OrderID → dynamic group → Intune assignment → profile status and propagation. Only the first mapping can be checked offline.</p></article>
+          <article><b>04</b><h3>Required Win32 App Blocks Enrollment Status Page</h3><p>Capture ESP item/status and IME, AppWorkload, and AppActionProcessor logs; examine detection, requirement, install context, return code, content/network, and retry behavior.</p></article>
+          <article><b>05</b><h3>Device Joins Microsoft Entra ID but Does Not Enroll in Intune</h3><p>Check MDM scope/license, user/device limit, enrollment restrictions, network, local scheduled/event evidence, and device state. Tenant causes require an authorized admin.</p></article>
+          <article><b>06</b><h3>User Receives an Unexpected OOBE Experience</h3><p>Separate consumer/setup screens, an unrecognized classic device, wrong path/profile, network failure, previous device state, and unsupported Windows edition/build.</p></article>
+          <article><b>07</b><h3>Device Enrolls with Incorrect Apps or Policies</h3><p>Compare user/device targeting, dynamic membership, assignment filters, intent, conflicts, sync/check-in, and expected versus observed results.</p></article>
+          <article><b>08</b><h3>Network Restrictions Interrupt Enrollment</h3><p>Capture stage, DNS, time, proxy, TLS and required Microsoft endpoint reachability. Link to Microsoft’s maintained endpoint list instead of copying a stale allowlist.</p></article>
+          <article><b>09</b><h3>TPM or Firmware Blocks a Scenario That Requires Attestation</h3><p>Verify physical/VM context, selected scenario, TPM version/state, firmware and current requirement. Escalate OEM/security ownership; do not generalize to every path.</p></article>
+          <article><b>10</b><h3>Enrollment Limit or Restriction Blocks the User</h3><p>Record error/time, platform/ownership context, user device count, restriction/limit evidence, and the authorized Intune path for review.</p></article>
+          <article><b>11</b><h3>Enrollment Completes but Compliance Remains Unknown</h3><p>Separate sync/check-in, policy assignment, evaluation prerequisites, grace period and Conditional Access impact.</p></article>
+          <article><b>12</b><h3>Authorized Reset and Redeployment Handoff</h3><p>Simulate approval, data disposition, reset/deregister/reuse decision, ownership, execution evidence, and post-enrollment verification. No real device action is exposed.</p></article>
+        </div>
+
+        <div class="operations-grid">
+          <article><h3>Autopilot, Entra, Intune, and OOBE Log Reference</h3><p>DeviceManagement-Enterprise-Diagnostics-Provider; ModernDeployment-Diagnostics-Provider-Autopilot; Provisioning-Diagnostics-Provider; MDM diagnostics CAB/report; and Intune Management Extension logs. Match the log to the failing stage.</p></article>
+          <article><h3>Intune Network Dependencies for Windows Enrollment</h3><p>Validate DNS, time, proxy and TCP 80/443, then link Microsoft’s maintained Intune endpoint list. Do not publish a copied endpoint inventory that will age.</p></article>
+          <article><h3>Reset, Reuse, Deregistration, and Redeployment Decision Guide</h3><p>Choose only with ownership, authorization and data-risk review. Wipe, reset, Autopilot Reset, deregistration and reimport solve different problems and require tenant/device roles.</p></article>
+          <article><h3>Post-enrollment Policy Baseline Map</h3><p>Concept map only: configuration, compliance, update, security and app policies can target user/device groups with filters. This lab does not invent production settings.</p></article>
+        </div>
+        <p class="source-note">Current-source basis: Microsoft Learn Autopilot requirements, manual device registration, device groups, scenario comparison, Enrollment Status Page troubleshooting, IME logs, and Intune endpoints. This page was reviewed 2026-08-30 and should be revalidated before real deployment work.</p>
       </section>
 
       <section class="about-project">

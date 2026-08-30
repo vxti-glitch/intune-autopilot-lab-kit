@@ -10,6 +10,7 @@ from src.autopilot_lab import (
     audit_devices,
     build_autopilot_import_rows,
     load_devices,
+    validate_strict_import_rows,
 )
 
 
@@ -47,6 +48,23 @@ class AutopilotLabTests(unittest.TestCase):
         self.assertEqual(rows[0]["Device Serial Number"], "LAB-001")
         self.assertEqual(rows[0]["Hardware Hash"], "HASH001")
         self.assertEqual(rows[0]["Assigned User"], "alex.johnson@contoso.com")
+        validate_strict_import_rows(rows)
+
+    def test_group_tag_and_assigned_user_are_optional(self) -> None:
+        path = self.write_csv([{"SerialNumber": "LAB-OPTIONAL", "HardwareHash": "HASH-OPTIONAL"}])
+        device = load_devices(path)[0]
+        self.assertEqual(device.group_tag, "")
+        self.assertEqual(device.assigned_user, "")
+        findings = audit_devices([device], today=date(2026, 8, 30))
+        self.assertEqual([finding.severity for finding in findings], ["low"])
+
+    def test_strict_import_rejects_quoted_fields_and_more_than_500_rows(self) -> None:
+        rows = [{"Device Serial Number": "LAB,001", "Windows Product ID": "", "Hardware Hash": "HASH", "Group Tag": "", "Assigned User": ""}]
+        with self.assertRaisesRegex(ValueError, "quotation marks"):
+            validate_strict_import_rows(rows)
+        valid = [{"Device Serial Number": f"LAB-{index}", "Windows Product ID": "", "Hardware Hash": f"HASH-{index}", "Group Tag": "", "Assigned User": ""} for index in range(501)]
+        with self.assertRaisesRegex(ValueError, "500"):
+            validate_strict_import_rows(valid)
 
     def test_audit_flags_duplicate_and_unknown_group_tag(self) -> None:
         path = self.write_csv(

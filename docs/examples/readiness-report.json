@@ -7,11 +7,12 @@
     "low": 2,
     "medium": 1
   },
-  "known_group_tags": {
+  "expected_group_tag_mappings": {
     "HELPDESK-STD": "Standard user-driven deployment",
     "HELPDESK-KIOSK": "Kiosk or shared workstation deployment",
     "HELPDESK-VIP": "Priority user deployment"
   },
+  "boundary": "Offline validation cannot verify Microsoft Entra group membership or Intune assignments.",
   "devices": [
     {
       "serial_number": "LAB-001",
@@ -62,8 +63,8 @@
       "severity": "medium",
       "check": "unknown-group-tag",
       "device": "LAB-004",
-      "message": "Group tag 'UNKNOWN-TAG' is not in the lab deployment profile map.",
-      "action": "Map the group tag to an Intune deployment profile before upload."
+      "message": "Group tag 'UNKNOWN-TAG' is not in the lab expected-assignment map.",
+      "action": "Confirm the optional OrderID/group-tag expectation; tenant assignment still requires authorized verification."
     },
     {
       "severity": "low",

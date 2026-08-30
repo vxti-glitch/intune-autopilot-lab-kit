@@ -15,9 +15,9 @@ This project is intentionally offline-safe. It does not connect to a tenant, upl
 The browser demo lets a recruiter or hiring manager complete the workflow without installing Python or accessing a Microsoft tenant:
 
 - Switch between synthetic device-intake scenarios
-- Run the same identity, assignment, group-tag, and age checks as the Python tool
+- Run the same identity, strict import, optional expected-mapping, and age checks as the Python tool
 - Inspect device-level remediation and endpoint-admin handoff notes
-- Use an Intune-inspired command bar, device search, profile-assignment status, and simulated sync state
+- Use an Intune-inspired command bar, device search, expected-assignment status, and simulated sync state without claiming tenant verification
 - Preview and download the generated import CSV, Markdown report, or JSON report
 - Optionally load a CSV that stays inside the browser and is never uploaded
 
@@ -37,6 +37,8 @@ _Sample run using the included synthetic Contoso device data._
 - Help desk runbook writing
 - Automated Python unit tests and GitHub Actions CI
 - Recruiter-friendly interactive workflow published with GitHub Pages
+- Current, source-dated classic Autopilot versus device-preparation field guide
+- Twelve deployment troubleshooting scenarios with local-versus-tenant evidence boundaries
 
 ## Workflow
 
@@ -79,10 +81,10 @@ Required columns:
 
 - `SerialNumber`
 - `HardwareHash`
+
+Optional planning columns:
+
 - `GroupTag`
-
-Recommended columns:
-
 - `AssignedUser`
 - `Manufacturer`
 - `Model`
@@ -96,6 +98,8 @@ LAB-001,BASE64HASHVALUE001,Dell,Latitude 5440,HELPDESK-STD,alex.johnson@contoso.
 ```
 
 Do not commit real hardware hashes or tenant data to a public repository. Use the sample data for demos.
+
+The richer intake CSV above is not the strict Microsoft import file. The generated strict export uses the exact headers `Device Serial Number`, `Windows Product ID`, `Hardware Hash`, `Group Tag`, and `Assigned User`; serial number and hardware hash are required, the other fields are optional, no extra columns or quotation marks are emitted, and manual batches are limited to 500 rows. Group tags can inform an expected `OrderID`-based dynamic-group mapping, but this offline lab cannot verify Entra group membership or Intune profile/app/policy assignments.
 
 ## Interview talking points
 

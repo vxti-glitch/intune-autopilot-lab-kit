@@ -31,7 +31,7 @@ const scenarios = {
   },
   assignment: {
     label: "Assignment cleanup — 4 devices",
-    description: "A Tier 1 review focused on missing users, invalid UPNs, and profile mapping.",
+    description: "A Tier 1 review focused on optional user data, invalid UPNs, and expected assignment mapping.",
     devices: [
       { serialNumber: "INT-201", hardwareHash: "SAFEHASH201", manufacturer: "Dell", model: "Latitude 5440", groupTag: "HELPDESK-STD", assignedUser: "", purchaseDate: "2025-10-22" },
       { serialNumber: "INT-202", hardwareHash: "SAFEHASH202", manufacturer: "Lenovo", model: "ThinkPad L14", groupTag: "HELPDESK-STD", assignedUser: "jordan.smith@contoso", purchaseDate: "2025-08-13" },
@@ -92,8 +92,9 @@ function statusLabel(status) {
 
 function profileStatus(device) {
   const mapped = ["HELPDESK-STD", "HELPDESK-VIP", "HELPDESK-KIOSK"].includes(device.groupTag);
-  if (!mapped) return { key: "unassigned", label: "Needs mapping" };
-  return { key: "assigned", label: "Assigned" };
+  if (!device.groupTag) return { key: "unassigned", label: "Optional · not supplied" };
+  if (!mapped) return { key: "unassigned", label: "Expected map unknown" };
+  return { key: "assigned", label: "Expected map only" };
 }
 
 function renderMetrics() {
@@ -186,13 +187,13 @@ function renderDetail() {
     <dl class="device-facts">
       <div><dt>Hardware</dt><dd>${escapeHtml(device.manufacturer)} ${escapeHtml(device.model)}</dd></div>
       <div><dt>Group tag</dt><dd class="mono">${escapeHtml(device.groupTag)}</dd></div>
-      <div><dt>Deployment profile</dt><dd><span class="profile-status profile-status--${profile.key}">${profile.label}</span></dd></div>
+      <div><dt>Expected assignment mapping</dt><dd><span class="profile-status profile-status--${profile.key}">${profile.label}</span></dd></div>
       <div><dt>Assigned user</dt><dd>${escapeHtml(device.assignedUser || "Shared / unassigned")}</dd></div>
       <div><dt>Purchase date</dt><dd>${escapeHtml(device.purchaseDate || "Not supplied")}</dd></div>
     </dl>
     <div class="handoff-note">
       <strong>Technician handoff</strong>
-      <p>${findings.length ? escapeHtml(findings.map((finding) => finding.action).join(" ")) : "No corrective action identified. Confirm the source record, protect the generated import file, and route it to the endpoint administrator."}</p>
+      <p>${findings.length ? escapeHtml(findings.map((finding) => finding.action).join(" ")) : "No offline data correction identified. Protect the generated import file and route it to an authorized endpoint administrator to verify Entra group membership and Intune assignments."}</p>
     </div>`;
 }
 

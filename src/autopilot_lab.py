@@ -13,7 +13,15 @@ from pathlib import Path
 from typing import Iterable
 
 
-REQUIRED_COLUMNS = ("SerialNumber", "HardwareHash", "GroupTag")
+REQUIRED_COLUMNS = ("SerialNumber", "HardwareHash")
+STRICT_IMPORT_COLUMNS = (
+    "Device Serial Number",
+    "Windows Product ID",
+    "Hardware Hash",
+    "Group Tag",
+    "Assigned User",
+)
+MAX_MANUAL_IMPORT_ROWS = 500
 KNOWN_GROUP_TAGS = {
     "HELPDESK-STD": "Standard user-driven deployment",
     "HELPDESK-KIOSK": "Kiosk or shared workstation deployment",
@@ -79,9 +87,9 @@ def load_devices(csv_path: Path) -> list[DeviceRecord]:
             group_tag = get("GroupTag")
             if not serial and not hardware_hash and not group_tag:
                 continue
-            if not serial or not hardware_hash or not group_tag:
+            if not serial or not hardware_hash:
                 raise ValueError(
-                    f"Row {index} must include SerialNumber, HardwareHash, and GroupTag."
+                    f"Row {index} must include SerialNumber and HardwareHash. GroupTag and AssignedUser are optional."
                 )
             devices.append(
                 DeviceRecord(
@@ -135,25 +143,25 @@ def audit_devices(
                 )
             )
 
-        if device.group_tag not in KNOWN_GROUP_TAGS:
+        if device.group_tag and device.group_tag not in KNOWN_GROUP_TAGS:
             findings.append(
                 Finding(
                     "medium",
                     "unknown-group-tag",
                     device.serial_number,
-                    f"Group tag '{device.group_tag}' is not in the lab deployment profile map.",
-                    "Map the group tag to an Intune deployment profile before upload.",
+                    f"Group tag '{device.group_tag}' is not in the lab expected-assignment map.",
+                    "Confirm the optional OrderID/group-tag expectation; tenant assignment still requires authorized verification.",
                 )
             )
 
         if device.group_tag != "HELPDESK-KIOSK" and not device.assigned_user:
             findings.append(
                 Finding(
-                    "medium",
+                    "low",
                     "missing-assigned-user",
                     device.serial_number,
-                    "Assigned user is missing for a user-driven deployment.",
-                    "Add the assigned user's UPN or move the device to a shared-device profile.",
+                    "Assigned User is blank. This field is optional in the Microsoft import format.",
+                    "Confirm the lab handoff expectation; do not block import solely for this optional field.",
                 )
             )
 
@@ -208,6 +216,24 @@ def build_autopilot_import_rows(devices: Iterable[DeviceRecord]) -> list[dict[st
     return rows
 
 
+def validate_strict_import_rows(rows: list[dict[str, str]]) -> None:
+    """Validate the current direct Intune manual-import file contract."""
+    if not rows:
+        raise ValueError("Strict import export requires at least one device row.")
+    if len(rows) > MAX_MANUAL_IMPORT_ROWS:
+        raise ValueError(f"Manual import supports no more than {MAX_MANUAL_IMPORT_ROWS} rows.")
+    for index, row in enumerate(rows, start=2):
+        if tuple(row.keys()) != STRICT_IMPORT_COLUMNS:
+            raise ValueError("Strict import headers must match the Microsoft column names and order exactly.")
+        if not row["Device Serial Number"] or not row["Hardware Hash"]:
+            raise ValueError(f"Row {index} requires Device Serial Number and Hardware Hash.")
+        for header, value in row.items():
+            if any(character in value for character in ('"', ",", "\r", "\n")):
+                raise ValueError(
+                    f"Row {index} field '{header}' contains a character that would require quotation marks."
+                )
+
+
 def build_report_payload(
     devices: list[DeviceRecord],
     findings: list[Finding],
@@ -229,7 +255,8 @@ def build_report_payload(
         "ready_device_count": len(ready_devices),
         "blocked_device_count": len(devices) - len(ready_devices),
         "severity_counts": dict(severity_counts),
-        "known_group_tags": KNOWN_GROUP_TAGS,
+        "expected_group_tag_mappings": KNOWN_GROUP_TAGS,
+        "boundary": "Offline validation cannot verify Microsoft Entra group membership or Intune assignments.",
         "devices": [asdict(device) for device in devices],
         "findings": [asdict(finding) for finding in findings],
     }
@@ -246,11 +273,11 @@ def render_markdown_report(payload: dict[str, object]) -> str:
         f"- Ready for import: {payload['ready_device_count']}",
         f"- Needs review: {payload['blocked_device_count']}",
         "",
-        "## Known Group Tags",
+        "## Expected Group Tag Mappings",
         "",
     ]
 
-    for tag, description in sorted(payload["known_group_tags"].items()):
+    for tag, description in sorted(payload["expected_group_tag_mappings"].items()):
         lines.append(f"- `{tag}`: {description}")
 
     lines.extend(["", "## Findings", ""])
@@ -274,6 +301,7 @@ def render_markdown_report(payload: dict[str, object]) -> str:
             "2. Confirm medium severity findings with the endpoint admin.",
             "3. Save the generated import CSV in a restricted location.",
             "4. Upload only sanitized demo data to public repositories.",
+            "5. Have an authorized endpoint administrator verify Entra group membership and Intune assignments.",
             "",
         ]
     )
@@ -281,9 +309,10 @@ def render_markdown_report(payload: dict[str, object]) -> str:
 
 
 def write_csv(rows: list[dict[str, str]], output_path: Path) -> None:
+    validate_strict_import_rows(rows)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
+    with output_path.open("w", newline="", encoding="cp1252") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()), quoting=csv.QUOTE_NONE)
         writer.writeheader()
         writer.writerows(rows)
 
