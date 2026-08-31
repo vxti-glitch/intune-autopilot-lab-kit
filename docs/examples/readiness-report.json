@@ -13,6 +13,22 @@
     "HELPDESK-VIP": "Priority user deployment"
   },
   "boundary": "Offline validation cannot verify Microsoft Entra group membership or Intune assignments.",
+  "import_specification": {
+    "source": "https://learn.microsoft.com/en-us/autopilot/add-devices",
+    "checked_on": "2026-08-31",
+    "headers": [
+      "Device Serial Number",
+      "Windows Product ID",
+      "Hardware Hash",
+      "Group Tag",
+      "Assigned User"
+    ],
+    "maximum_device_rows": 500,
+    "headers_case_sensitive": true,
+    "quotation_marks_allowed": false,
+    "extra_columns_allowed": false,
+    "encoding": "ANSI-compatible (cp1252 output)"
+  },
   "devices": [
     {
       "serial_number": "LAB-001",

@@ -32,7 +32,7 @@
         <div class="hero-copy">
           <div class="lab-label"><span class="pulse"></span> Interactive portfolio lab · Synthetic data</div>
           <h1>Catch bad device data <em>before</em> Autopilot import.</h1>
-          <p class="hero-lede">A browser-based walkthrough of the offline Intune and Windows Autopilot intake validator built by <strong>vxti-glitch</strong>. Review a device batch, identify deployment blockers, and generate an escalation-ready handoff.</p>
+          <p class="hero-lede">A browser-based walkthrough of the offline Windows Autopilot intake and import-file validator built by <strong>vxti-glitch</strong>. Review synthetic device data, identify import-file blockers, and generate a simulated handoff.</p>
           <div class="hero-actions">
             <button class="button button--primary" id="start-tour" type="button">Start the 90-second tour <span aria-hidden="true">→</span></button>
             <a class="button button--ghost" href="#safety">How this stays safe</a>
@@ -191,7 +191,7 @@
         </article>
 
         <div class="guide-grid">
-          <article><span>Import specification</span><h3>Manual Import CSV Specification and Validation Checklist</h3><p>Exact case-sensitive headers: Device Serial Number, Windows Product ID, Hardware Hash, Group Tag, Assigned User. Serial and hash are required; the other three are optional. No extra columns, quotation marks, or more than 500 rows. Export ANSI-compatible text and avoid editing the strict file in Excel.</p></article>
+          <article><span>Import specification</span><h3>Manual Import CSV Specification and Validation Checklist</h3><p>Exact case-sensitive headers: Device Serial Number, Windows Product ID, Hardware Hash, Group Tag, Assigned User. Serial and hash are required; the other three are optional. No extra columns, quotation marks, or more than 500 device rows. Export ANSI-compatible text and avoid editing the strict file in Excel. Source: <a href="https://learn.microsoft.com/en-us/autopilot/add-devices">Microsoft Learn</a>, checked 2026-08-31.</p></article>
           <article><span>Assignment boundary</span><h3>Group Tags, Dynamic Device Groups, and Assignment Boundaries</h3><p><code>Group Tag</code> becomes the Autopilot device <code>OrderID</code> attribute. A dynamic Entra device group can evaluate that attribute, and Intune content can target the group. This offline demo validates only the expected mapping; it cannot verify membership or assignment.</p></article>
           <article><span>Before OOBE</span><h3>Pre-deployment Technician Readiness Checklist</h3><p>Verify asset/serial, trusted hash source, selected path, supported Windows state, power, network, physical/TPM needs for that path, strict import data, reset approval, data disposition, and the endpoint-admin handoff.</p></article>
           <article><span>After enrollment</span><h3>Post-enrollment Validation Checklist</h3><p>Verify join and MDM state, primary-user/ownership expectation, sync, required apps, configuration and compliance results, update state, BitLocker/recovery-key ownership, user task, and ticket evidence. Tenant results require authorized access.</p></article>
@@ -221,7 +221,7 @@
           <article><h3>Reset, Reuse, Deregistration, and Redeployment Decision Guide</h3><p>Choose only with ownership, authorization and data-risk review. Wipe, reset, Autopilot Reset, deregistration and reimport solve different problems and require tenant/device roles.</p></article>
           <article><h3>Post-enrollment Policy Baseline Map</h3><p>Concept map only: configuration, compliance, update, security and app policies can target user/device groups with filters. This lab does not invent production settings.</p></article>
         </div>
-        <p class="source-note">Current-source basis: Microsoft Learn Autopilot requirements, manual device registration, device groups, scenario comparison, Enrollment Status Page troubleshooting, IME logs, and Intune endpoints. This page was reviewed 2026-08-30 and should be revalidated before real deployment work.</p>
+        <p class="source-note">Current-source basis: Microsoft Learn Autopilot requirements, manual device registration, device groups, scenario comparison, Enrollment Status Page troubleshooting, IME logs, and Intune endpoints. The strict import rules were checked 2026-08-31 and should be revalidated before operational use.</p>
       </section>
 
       <section class="about-project">
@@ -233,7 +233,7 @@
           <span>Device intake validation</span><span>Windows Autopilot concepts</span><span>Intune profile readiness</span><span>Data quality checks</span><span>Escalation documentation</span><span>Python automation</span>
         </div>
         <div class="project-note">
-          <p><strong>Built by vxti-glitch</strong> as hands-on portfolio work for help desk and IT support roles. This lab demonstrates process understanding and technical practice; it is not presented as paid or production experience.</p>
+          <p><strong>Built by vxti-glitch</strong> as an offline portfolio project for help desk and IT support roles. I ran parsing, validation, report generation, tests, and this browser simulation locally; I did not register a tenant or enroll, assign, configure, or deploy a device.</p>
           <a class="button button--dark" href="https://github.com/vxti-glitch/intune-autopilot-lab-kit">Explore the code and tests <span aria-hidden="true">↗</span></a>
         </div>
       </section>
