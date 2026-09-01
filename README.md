@@ -1,10 +1,10 @@
-# Intune Autopilot Lab Kit
+# Offline Autopilot Intake and Import-File Validator
 
 [![Python tests](https://github.com/vxti-glitch/intune-autopilot-lab-kit/actions/workflows/python-tests.yml/badge.svg)](https://github.com/vxti-glitch/intune-autopilot-lab-kit/actions/workflows/python-tests.yml)
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![Tenant access](https://img.shields.io/badge/Tenant_access-not_required-2E8B57)
 
-A portfolio-ready help desk lab for preparing Windows devices for Microsoft Intune and Windows Autopilot onboarding.
+An offline Autopilot intake and import-file validator for a portfolio lab.
 
 This project is intentionally offline-safe. It does not connect to a tenant, upload device hashes, or require Microsoft Graph permissions. Instead, it mirrors the intake, validation, import-file preparation, and documentation workflow a Tier 1 or Tier 2 technician would use before handing devices to an endpoint admin.
 
@@ -21,7 +21,7 @@ The browser demo lets a recruiter or hiring manager complete the workflow withou
 - Preview and download the generated import CSV, Markdown report, or JSON report
 - Optionally load a CSV that stays inside the browser and is never uploaded
 
-> **Portfolio disclosure:** This is hands-on simulated lab work, not paid employment or production tenant experience. All included people, devices, hashes, and tenant data are fictional.
+> **Portfolio disclosure:** I ran the parser, validation rules, report generation, automated tests, and browser simulation locally. This is a simulated portfolio project, not paid employment, tenant administration, device enrollment, or production deployment experience. All included people, devices, hashes, and tenant data are fictional.
 
 ![Sample Autopilot validation run](docs/assets/terminal-demo-final.png)
 
@@ -38,7 +38,7 @@ _Sample run using the included synthetic Contoso device data._
 - Automated Python unit tests and GitHub Actions CI
 - Recruiter-friendly interactive workflow published with GitHub Pages
 - Current, source-dated classic Autopilot versus device-preparation field guide
-- Twelve deployment troubleshooting scenarios with local-versus-tenant evidence boundaries
+- Twelve simulated troubleshooting scenarios with local-versus-tenant evidence boundaries
 
 ## Workflow
 
@@ -99,9 +99,24 @@ LAB-001,BASE64HASHVALUE001,Dell,Latitude 5440,HELPDESK-STD,alex.johnson@contoso.
 
 Do not commit real hardware hashes or tenant data to a public repository. Use the sample data for demos.
 
-The richer intake CSV above is not the strict Microsoft import file. The generated strict export uses the exact headers `Device Serial Number`, `Windows Product ID`, `Hardware Hash`, `Group Tag`, and `Assigned User`; serial number and hardware hash are required, the other fields are optional, no extra columns or quotation marks are emitted, and manual batches are limited to 500 rows. Group tags can inform an expected `OrderID`-based dynamic-group mapping, but this offline lab cannot verify Entra group membership or Intune profile/app/policy assignments.
+The richer intake CSV above is not the strict Microsoft import file. The generated strict export uses the exact case-sensitive headers `Device Serial Number`, `Windows Product ID`, `Hardware Hash`, `Group Tag`, and `Assigned User`; serial number and hardware hash are required, the other fields are optional, extra columns and quotation marks are not allowed, manual batches are limited to 500 device rows, and Microsoft specifies ANSI-format text. These rules were checked on **2026-08-31** against [Microsoft Learn: Manually register devices with Windows Autopilot](https://learn.microsoft.com/en-us/autopilot/add-devices). The generator writes Windows-1252 (`cp1252`) as an ANSI-compatible encoding and rejects values that would require CSV quoting.
 
-## Interview talking points
+Group tags can inform an expected `OrderID`-based dynamic-group mapping, but this offline lab cannot verify Entra group membership or Intune profile, app, or policy assignments.
+
+## Not demonstrated
+
+- Tenant registration
+- Dynamic-group evaluation
+- Profile assignment
+- Device enrollment
+- Enrollment Status Page behavior
+- Compliance evaluation
+- Application delivery
+- Production device deployment
+
+See [How I built and verified this](docs/HOW_I_BUILT_AND_VERIFIED_THIS.md) for the exact local evidence and remaining boundary.
+
+## Discussion topics
 
 - How Intune enrollment differs from traditional imaging
 - Why device identity and user assignment accuracy matters

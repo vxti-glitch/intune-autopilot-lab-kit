@@ -12,7 +12,7 @@ Prepare an offline evidence package for an authorized endpoint administrator. Va
 4. If a group tag is supplied, record only the expected `OrderID`-based group mapping. Do not report a deployment profile as assigned until an authorized admin verifies dynamic group membership and Intune assignment.
 5. Confirm the model is supported by the current hardware standard.
 6. Confirm older devices are flagged for review before deployment.
-7. Confirm the strict file has the exact five case-sensitive headers, no extra columns or quotation marks, ANSI-compatible encoding, and no more than 500 rows.
+7. Confirm the strict file has the exact five case-sensitive headers, no extra columns or quotation marks, ANSI-compatible encoding, and no more than 500 device rows. These rules were checked on **2026-08-31** against [Microsoft Learn: Manually register devices with Windows Autopilot](https://learn.microsoft.com/en-us/autopilot/add-devices).
 8. Record supported Windows edition/build, power, network, OOBE/reset state, and scenario-specific TPM/firmware requirements.
 
 ## Escalation Criteria

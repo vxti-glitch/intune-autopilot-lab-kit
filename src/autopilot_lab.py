@@ -22,6 +22,8 @@ STRICT_IMPORT_COLUMNS = (
     "Assigned User",
 )
 MAX_MANUAL_IMPORT_ROWS = 500
+IMPORT_SPEC_SOURCE = "https://learn.microsoft.com/en-us/autopilot/add-devices"
+IMPORT_SPEC_CHECKED_ON = "2026-08-31"
 KNOWN_GROUP_TAGS = {
     "HELPDESK-STD": "Standard user-driven deployment",
     "HELPDESK-KIOSK": "Kiosk or shared workstation deployment",
@@ -257,6 +259,16 @@ def build_report_payload(
         "severity_counts": dict(severity_counts),
         "expected_group_tag_mappings": KNOWN_GROUP_TAGS,
         "boundary": "Offline validation cannot verify Microsoft Entra group membership or Intune assignments.",
+        "import_specification": {
+            "source": IMPORT_SPEC_SOURCE,
+            "checked_on": IMPORT_SPEC_CHECKED_ON,
+            "headers": list(STRICT_IMPORT_COLUMNS),
+            "maximum_device_rows": MAX_MANUAL_IMPORT_ROWS,
+            "headers_case_sensitive": True,
+            "quotation_marks_allowed": False,
+            "extra_columns_allowed": False,
+            "encoding": "ANSI-compatible (cp1252 output)",
+        },
         "devices": [asdict(device) for device in devices],
         "findings": [asdict(finding) for finding in findings],
     }

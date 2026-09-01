@@ -7,8 +7,12 @@ from datetime import date
 from pathlib import Path
 
 from src.autopilot_lab import (
+    IMPORT_SPEC_CHECKED_ON,
+    IMPORT_SPEC_SOURCE,
+    DeviceRecord,
     audit_devices,
     build_autopilot_import_rows,
+    build_report_payload,
     load_devices,
     validate_strict_import_rows,
 )
@@ -65,6 +69,17 @@ class AutopilotLabTests(unittest.TestCase):
         valid = [{"Device Serial Number": f"LAB-{index}", "Windows Product ID": "", "Hardware Hash": f"HASH-{index}", "Group Tag": "", "Assigned User": ""} for index in range(501)]
         with self.assertRaisesRegex(ValueError, "500"):
             validate_strict_import_rows(valid)
+
+    def test_report_attributes_strict_rules_to_checked_official_source(self) -> None:
+        device = DeviceRecord("LAB-001", "HASH001", "", "")
+        payload = build_report_payload([device], [], tenant_name="Synthetic Lab")
+        spec = payload["import_specification"]
+        self.assertEqual(spec["source"], IMPORT_SPEC_SOURCE)
+        self.assertEqual(spec["checked_on"], IMPORT_SPEC_CHECKED_ON)
+        self.assertEqual(spec["maximum_device_rows"], 500)
+        self.assertTrue(spec["headers_case_sensitive"])
+        self.assertFalse(spec["quotation_marks_allowed"])
+        self.assertFalse(spec["extra_columns_allowed"])
 
     def test_audit_flags_duplicate_and_unknown_group_tag(self) -> None:
         path = self.write_csv(
